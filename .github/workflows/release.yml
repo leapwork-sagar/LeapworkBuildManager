@@ -28,6 +28,9 @@ jobs:
           $releaseTags = @(gh api --paginate "repos/$env:GITHUB_REPOSITORY/releases" --jq '.[].tag_name')
           if ($LASTEXITCODE -ne 0) { throw 'Could not inspect existing releases.' }
           if ($releaseTags -contains $tag) { throw "Release $tag already exists. Increment the version first." }
+          $tags = @(gh api --paginate "repos/$env:GITHUB_REPOSITORY/tags" --jq '.[].name')
+          if ($LASTEXITCODE -ne 0) { throw 'Could not inspect existing tags.' }
+          if ($tags -contains $tag) { throw "Tag $tag already exists. Use a new version so the draft points to this tested commit." }
           "RELEASE_TAG=$tag" >> $env:GITHUB_ENV
       - name: Build, test and package portable application
         shell: pwsh
@@ -53,3 +56,4 @@ jobs:
           '@ | Set-Content releases/release-notes.md
           gh release create $env:RELEASE_TAG $exe $checksum --draft --target $env:GITHUB_SHA --title "Leapwork Build Manager $env:RELEASE_TAG" --generate-notes --notes-file releases/release-notes.md
           if ($LASTEXITCODE -ne 0) { throw 'Draft release creation failed; inspect GitHub Releases before retrying.' }
+
