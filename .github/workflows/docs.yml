@@ -1,0 +1,24 @@
+name: Documentation links
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: '23 8 * * 1'
+permissions:
+  contents: read
+concurrency:
+  group: docs-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  links:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check documentation links and images
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --verbose --no-progress --timeout 20 --max-retries 2 './*.md' './docs/**/*.md' './.github/**/*.md'
+          fail: true

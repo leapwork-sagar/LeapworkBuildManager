@@ -1,0 +1,35 @@
+name: Bug report
+description: Report unexpected application behavior.
+labels: [bug]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Application version
+      placeholder: v1.22.0.0
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Windows version and display scaling
+      placeholder: Windows 11, 125% scaling
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected and actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Screenshots or diagnostics (optional)
+      description: Review attachments first. Remove personal paths, usernames, credentials and signed URLs. Do not post sensitive security reports publicly.

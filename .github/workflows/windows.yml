@@ -1,7 +1,11 @@
 name: Windows build and tests
 on:
   push:
+    branches: [main]
   pull_request:
+concurrency:
+  group: windows-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:

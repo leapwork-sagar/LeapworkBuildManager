@@ -25,4 +25,15 @@ the UI and download flow. The output is portable but unsigned and not self-conta
 After source changes pass the required PR checks and merge to `main`, create a
 version tag and GitHub Release for that commit. Attach the tested EXE and
 `SHA256SUMS.txt`, verify the uploaded digest, and include requirements and release
-notes. Publication is manual; the CI workflow does not automatically publish releases.
+notes. Publication remains a manual maintainer action.
+
+## Prepare a draft on GitHub
+
+After merging a new four-part version in `VersionInfo.cs` and updating the changelog,
+open **Actions > Prepare draft release > Run workflow** and select `main`.
+The workflow refuses an existing release version, runs regression tests and the
+portable smoke check, verifies MSBuild, and attaches the EXE and `SHA256SUMS.txt`
+to a draft with generated release notes. It uses the exact workflow commit.
+It never publishes automatically. Review the assets, notes and manual checks above
+before publishing. If upload fails, inspect the draft before retrying; existing
+drafts are intentionally not overwritten. Running on another branch is skipped.
