@@ -1,8 +1,25 @@
-﻿# Leapwork Build Manager v1.22
+# Leapwork Build Manager v1.22
+
+[**Download latest portable EXE**](https://github.com/leapwork-sagar/LeapworkBuildManager/releases/latest/download/LeapworkBuildManager.exe) · [Release notes and checksums](https://github.com/leapwork-sagar/LeapworkBuildManager/releases/latest)
+
+[![Windows build and tests](https://github.com/leapwork-sagar/LeapworkBuildManager/actions/workflows/windows.yml/badge.svg?branch=main)](https://github.com/leapwork-sagar/LeapworkBuildManager/actions/workflows/windows.yml)
 
 Find available Leapwork builds and download their installers from a portable Windows application.
 Enter build digits (dots are added automatically), search, select a result and download.
 Advanced mode checks a manually selected build type.
+
+![Leapwork Build Manager showing a build ready to download](docs/images/build-manager.png)
+
+*Screenshot uses illustrative build data; availability and size depend on the selected build.*
+
+## Quick start
+
+1. Download `LeapworkBuildManager.exe` above. Optionally verify it against `SHA256SUMS.txt` on the release page.
+2. Run it on Windows with **.NET Framework 4.7.2 or later** installed. No installation or SDK is needed.
+3. Enter build digits, for example `20262257` becomes `2026.2.257`, then select **Find available builds**.
+4. Select a result, choose **Download**, and pick a destination. Use **Open folder** after completion.
+
+Internet access is needed to check and download builds. **Advanced** checks only your chosen build type.
 
 ## Running and sharing
 
@@ -18,6 +35,10 @@ Reopen the app after changing Windows display scaling.
 Open `LeapworkBuildManager.sln` in Visual Studio, or run `./scripts/build.ps1`
 from PowerShell on Windows to compile and run all regression suites. No NuGet restore
 is needed. The solution builds the production project; tests run through the script.
+
+Contribute through a pull request to `main`. The required `test` check in
+**Windows build and tests** runs regression tests and MSBuild on `windows-latest`.
+See [Contributing](CONTRIBUTING.md).
 
 ```text
 src/LeapworkBuildManager/
