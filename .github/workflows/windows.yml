@@ -1,0 +1,20 @@
+name: Windows build and tests
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and run regression tests
+        shell: pwsh
+        run: ./scripts/build.ps1
+      - name: Verify standard project
+        shell: pwsh
+        run: |
+          & "$env:WINDIR/Microsoft.NET/Framework64/v4.0.30319/MSBuild.exe" src/LeapworkBuildManager/LeapworkBuildManager.csproj /t:Rebuild /p:Configuration=Release /verbosity:minimal
+          if ($LASTEXITCODE -ne 0) { throw 'MSBuild failed' }

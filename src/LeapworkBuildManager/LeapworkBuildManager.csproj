@@ -1,0 +1,99 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <OutputType>WinExe</OutputType>
+    <AssemblyName>LeapworkBuildManager</AssemblyName>
+    <RootNamespace>LeapworkBuildManager</RootNamespace>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <OutputPath>..\..\artifacts\msbuild\$(Configuration)\</OutputPath>
+    <Optimize>true</Optimize>
+    <AppConfig>App.config</AppConfig>
+    <ApplicationIcon>Assets\app.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" /><Reference Include="System.Core" />
+    <Reference Include="System.Net.Http" /><Reference Include="System.Drawing" />
+    <Reference Include="System.Windows.Forms" /><Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <Compile Include="Services\SavedInstallerService.cs" />
+    <Compile Include="UI\Forms\Dialogs\SavedInstallerDialog.cs" />
+    <Compile Include="Application\FocusPolicy.cs" />
+    <Compile Include="UI\Forms\Main\MainForm.Interaction.cs" />
+    <Compile Include="UI\Formatting\DestinationText.cs" />
+    <Compile Include="UI\Forms\Main\MainForm.Events.cs" />
+    <Compile Include="Diagnostics\DiagnosticContext.cs" />
+    <Compile Include="Diagnostics\DiagnosticReport.cs" />
+
+    <Compile Include="Services\RestrictedRedirectHandler.cs" />
+    <Compile Include="Diagnostics\DiagnosticPrivacy.cs" />
+    <Compile Include="Diagnostics\DiagnosticLog.cs" />
+    <Compile Include="Application\FailureInfo.cs" />
+    <Compile Include="UI\Forms\Main\MainForm.Diagnostics.cs" />
+
+    <Compile Include="VersionInfo.cs" />
+    <Compile Include="Application\BuildController.cs" />
+    <Compile Include="Application\BuildInputFeedback.cs" />
+    <Compile Include="Application\DownloadUiModel.cs" />
+    <Compile Include="Application\OperationCoordinator.cs" />
+    <Compile Include="Application\SingleInstance.cs" />
+    <Compile Include="Models\AvailabilityResult.cs" />
+    <Compile Include="Models\BuildKind.cs" />
+    <Compile Include="Models\BuildMatch.cs" />
+    <Compile Include="Diagnostics\DiagnosticEvent.cs" />
+    <Compile Include="Models\DownloadProgressInfo.cs" />
+    <Compile Include="Models\DownloadResult.cs" />
+    <Compile Include="UI\Formatting\ProgressText.cs" />
+    <Compile Include="Models\SearchProgressInfo.cs" />
+    <Compile Include="Models\VerifiedBuild.cs" />
+    <Compile Include="Persistence\Preferences.cs" />
+    <Compile Include="Persistence\PreferencesContent.cs" />
+    <Compile Include="Persistence\SettingsWriter.cs" />
+    <Compile Include="Persistence\SettingsSnapshot.cs" />
+    <Compile Include="Services\AsyncProbe.cs" />
+    <Compile Include="Services\BuildService.cs" />
+    <Compile Include="Services\BuildService.Discovery.cs" />
+    <Compile Include="Services\BuildService.Download.cs" />
+    <Compile Include="Services\BuildService.Rules.cs" />
+    <Compile Include="Services\DownloadPreparationService.cs" />
+    <Compile Include="Services\OperationalSettings.cs" />
+    <Compile Include="Services\RecentSpeed.cs" />
+    <Compile Include="UI\Controls\BuildNumberBox.cs" />
+    <Compile Include="UI\Controls\Card.cs" />
+    <Compile Include="UI\Controls\BufferedPanel.cs" />
+    <Compile Include="UI\Controls\DarkComboBox.cs" />
+    <Compile Include="UI\Controls\DarkTextBox.cs" />
+    <Compile Include="UI\Controls\DownloadProgress.cs" />
+    <Compile Include="UI\Controls\SoftButton.cs" />
+    <Compile Include="UI\Forms\Main\MainForm.State.cs" />
+    <Compile Include="Application\ApplicationState.cs" />
+    <Compile Include="UI\Forms\Dialogs\ExistingInstallerDialog.cs" />
+    <Compile Include="UI\Forms\Dialogs\HelpDialog.cs" />
+    <Compile Include="UI\Formatting\HistoryFormatter.cs" />
+    <Compile Include="UI\Forms\Main\MainForm.Accessibility.cs" />
+    <Compile Include="UI\Forms\Main\MainForm.cs" />
+    <Compile Include="UI\Forms\Main\MainForm.Help.cs" />
+    <Compile Include="UI\Forms\Main\MainForm.Initialize.cs" />
+    <Compile Include="UI\Forms\Main\MainForm.Layout.cs" />
+    <Compile Include="UI\Forms\Main\MainForm.Lazy.cs" />
+    <Compile Include="UI\Forms\Main\MainForm.Operations.cs" />
+    <Compile Include="UI\Forms\Main\MainForm.Power.cs" />
+    <Compile Include="UI\Forms\Main\MainForm.Preferences.cs" />
+    <Compile Include="UI\Forms\Main\MainForm.Presentation.cs" />
+    <Compile Include="UI\Forms\Main\MainForm.Transfer.cs" />
+    <Compile Include="UI\Styling\LayoutMetrics.cs" />
+    <Compile Include="UI\Styling\Theme.cs" />
+    <Compile Include="UI\Styling\UiScale.cs" />
+    <Compile Include="UI\Styling\WindowLayoutPlan.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\app.ico"><LogicalName>LeapworkIcon</LogicalName></EmbeddedResource>
+    <EmbeddedResource Include="Assets\logo.png"><LogicalName>LeapworkLogo</LogicalName></EmbeddedResource>
+    <None Include="App.config" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>
