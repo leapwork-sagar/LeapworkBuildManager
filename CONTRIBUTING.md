@@ -28,4 +28,20 @@ and MSBuild: [verified run](https://github.com/leapwork-sagar/LeapworkBuildManag
 Keep manual release checks for real downloads, sleep/wake and display scaling.
 Publish binaries through [GitHub Releases](https://github.com/leapwork-sagar/LeapworkBuildManager/releases).
 
+## Tracking and automation
+
+Use the bug-report or feature-request form under **Issues > New issue**. Keep one
+accepted improvement per issue, with clear acceptance criteria. Apply `bug` for
+defects, `enhancement` for features, `ui` for interface work and `maintenance` for
+repository upkeep; `documentation` can be combined with these. Assign accepted
+work to a milestone when its scope is agreed, without implying a release date.
+Link the issue in the PR and use `Closes #number` when the change completes it.
+
+The PR template records changes, validation and UI screenshots. Windows CI runs
+on PRs and pushes to `main`, cancelling superseded runs. The Documentation links
+workflow checks Markdown links and referenced images on PRs, `main`, weekly and
+on manual request; external outages may require a rerun. Dependabot proposes
+weekly GitHub Actions updates for review; updates are not automatically merged.
+See the release guide for the manually triggered draft-release workflow.
+
 Open LeapworkBuildManager.sln for the production project. Use tests/Support for shared test helpers; register suites in scripts/build.ps1. See docs/RELEASING.md for packaging and CHANGELOG.md for release notes.
