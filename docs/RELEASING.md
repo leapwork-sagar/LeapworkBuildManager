@@ -1,5 +1,8 @@
 # Building and releasing
 
+Published binaries, checksums and notes are on [GitHub Releases](https://github.com/leapwork-sagar/LeapworkBuildManager/releases).
+The [latest release](https://github.com/leapwork-sagar/LeapworkBuildManager/releases/latest) is the recommended download.
+
 Use Windows, PowerShell and .NET Framework 4.7.2+. The scripts use the installed
 Framework compiler and require no NuGet packages. Paths resolve from the script location.
 
@@ -18,3 +21,8 @@ generated bin/obj/artifacts directories. Commit source, not binaries or user set
 from an EXE-only directory. It checks assets, startup and shutdown, not SmartScreen
 or a machine missing the required runtime. Before distribution, manually review
 the UI and download flow. The output is portable but unsigned and not self-contained.
+
+After source changes pass the required PR checks and merge to `main`, create a
+version tag and GitHub Release for that commit. Attach the tested EXE and
+`SHA256SUMS.txt`, verify the uploaded digest, and include requirements and release
+notes. Publication is manual; the CI workflow does not automatically publish releases.
