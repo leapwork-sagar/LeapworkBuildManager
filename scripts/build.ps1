@@ -27,7 +27,7 @@ $suites = @(
  @{File='Application\OptimizationTests.cs';Main='OptimizationTests'},
  @{File='Application\ValidationTests.cs';Main='ValidationTests'},
  @{File='Application\ReliabilityTests.cs';Main='ReliabilityTests'},
- @{File=@('Diagnostics\SecurityAndPersistenceTests.cs','UI\DiagnosticLifecycleTests.cs');Main='HardeningTests'}
+ @{File=@('Diagnostics\SecurityAndPersistenceTests.cs','Diagnostics\AttachmentChecks.cs','UI\DiagnosticLifecycleTests.cs');Main='HardeningTests'}
 )
 foreach ($suite in $suites) {
  $testPath = @($suite.File | ForEach-Object { Join-Path $projectRoot ('tests\' + $_) })

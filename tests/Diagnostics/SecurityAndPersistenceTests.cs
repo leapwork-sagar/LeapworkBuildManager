@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -52,6 +52,7 @@ static partial class HardeningTests
     static void Main()
     {
         UiChecks();
+        AttachmentChecks().GetAwaiter().GetResult();
         Run().GetAwaiter().GetResult();
         Console.WriteLine(count + " hardening checks passed.");
     }
@@ -64,7 +65,8 @@ static partial class HardeningTests
             "C:/Users/Alice/file.msi",
             "file:///C:/Users/Alice/file.msi",
             "file://server/share/Alice/file.msi",
-            @"\\server\Alice\file.msi"
+            @"\\server\Alice\file.msi",
+            "//server/share/Alice/file.msi"
         }
 
         )

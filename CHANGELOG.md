@@ -1,5 +1,12 @@
 # Changelog
 
+## v1.23
+
+- Launch Open folder through the trusted Windows Explorer path.
+- Hide forward-slash network paths when exporting diagnostics with path hiding enabled.
+- Apply Windows Attachment Services before committing downloads, preserving existing installers if attachment processing fails.
+- Verify internet-origin metadata after replacement on NTFS and cover attachment rejection with regression tests.
+
 ## v1.22
 
 - Check saved installers on history selection, distinguish missing from inaccessible locations, and offer Open folder, Retry check or Download again.

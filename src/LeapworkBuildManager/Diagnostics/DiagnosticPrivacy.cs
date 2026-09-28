@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text.RegularExpressions;
 
 namespace LeapworkBuildManager
@@ -26,7 +26,7 @@ namespace LeapworkBuildManager
             if (hidePaths)
             {
                 value = Regex.Replace(value, @"\bfile:(?://)?[^\r\n|""<>]*", "[local path]", RegexOptions.IgnoreCase);
-                value = Regex.Replace(value, @"(?<![A-Za-z0-9])(?:[A-Za-z]:[\\/]|\\\\)[^\r\n|""<>]*", "[local path]", RegexOptions.IgnoreCase);
+                value = Regex.Replace(value, @"(?<![A-Za-z0-9])(?:[A-Za-z]:[\\/]|\\\\|(?<![:/])//)[^\r\n|""<>]*", "[local path]", RegexOptions.IgnoreCase);
             }
 
             return value;

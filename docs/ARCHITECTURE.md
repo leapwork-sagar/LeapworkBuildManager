@@ -176,3 +176,16 @@ and ETA. New data clears the warning and resets the speed baseline. The existing
 interrupt a pending read. Timeout/cancellation cleans the partial file and preserves
 an existing installer. Retry restarts rather than resuming. Tests use short injected
 intervals and simulated streams; physical network loss is not reproduced end to end.
+## Windows download security
+
+`WindowsFileActions` centralizes Explorer launches using the absolute Windows
+directory path. Download completion passes the temporary installer and its source
+URL to Windows Attachment Services on a dedicated STA thread before publishing
+the file. Attachment-policy failures fail the download and preserve an existing
+installer. Cancellation is checked again after attachment processing; Windows
+attachment processing itself cannot be interrupted by the cancellation token.
+
+Origin metadata follows Windows policy and filesystem capabilities. This is not
+publisher-signature verification and does not guarantee a particular Windows
+warning. The hardening tests exercise NTFS origin metadata after replacement,
+policy-failure cleanup, and diagnostic network-path redaction.

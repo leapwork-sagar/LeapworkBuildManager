@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Net.Http;
 using System.Threading;
@@ -8,6 +8,7 @@ namespace LeapworkBuildManager
     public sealed partial class BuildService : IDisposable
     {
         readonly HttpClient client;
+        internal Action<string, string, Uri> SaveAttachment = WindowsFileActions.SaveAttachment;
         public DownloadPreparationService Preparation { get; private set; }
         public Action<string, Exception> Diagnostic { get; set; }
         internal Action<string, Exception, Uri> DiagnosticWithUrl { get; set; }
