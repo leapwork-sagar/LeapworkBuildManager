@@ -13,7 +13,7 @@ jobs:
     runs-on: windows-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Build and run regression tests
         shell: pwsh
         run: ./scripts/build.ps1
