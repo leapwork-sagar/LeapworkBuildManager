@@ -37,3 +37,11 @@ to a draft with generated release notes. It uses the exact workflow commit.
 It never publishes automatically. Review the assets, notes and manual checks above
 before publishing. If upload fails, inspect the draft before retrying; existing
 drafts are intentionally not overwritten. Running on another branch is skipped.
+
+The draft workflow checks the tag against `VersionInfo.Number` and the latest
+changelog heading before building. Before upload it verifies required EXE/checksum
+assets, EXE file and assembly versions, and the SHA-256 manifest contents.
+Historical headings such as `v1.22` mean `1.22.0.0`; nonzero patch/revision values
+must be included. Run `scripts/check-release.ps1` with `-Tag` and optionally both
+`-ExecutablePath` and `-ChecksumPath` to perform the same checks locally.
+Windows CI tests rejection of invalid release metadata and assets.

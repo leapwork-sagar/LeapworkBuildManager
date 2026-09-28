@@ -22,3 +22,6 @@ jobs:
         run: |
           & "$env:WINDIR/Microsoft.NET/Framework64/v4.0.30319/MSBuild.exe" src/LeapworkBuildManager/LeapworkBuildManager.csproj /t:Rebuild /p:Configuration=Release /verbosity:minimal
           if ($LASTEXITCODE -ne 0) { throw 'MSBuild failed' }
+      - name: Test release consistency checks
+        shell: pwsh
+        run: ./scripts/test-release-check.ps1
