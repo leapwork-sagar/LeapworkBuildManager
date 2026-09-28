@@ -1,0 +1,58 @@
+name: Formatting
+on:
+  pull_request:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: format-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Find changed text files and check whitespace and conflicts
+        id: files
+        env:
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+        shell: bash
+        run: |
+          git diff --check "$BASE" "$HEAD"
+          git diff --name-only --diff-filter=ACMR -z "$BASE" "$HEAD" > /tmp/changed-files
+          python3 - <<'PY'
+          import os, pathlib, re, subprocess
+          files = [p.decode() for p in pathlib.Path('/tmp/changed-files').read_bytes().split(b'\0') if p]
+          text = []
+          for name in files:
+              path = pathlib.Path(name)
+              if not path.is_file() or path.is_symlink():
+                  continue
+              data = path.read_bytes()
+              if b'\0' in data or path.suffix.lower() in {'.png', '.ico', '.jpg', '.zip', '.exe'}:
+                  continue
+              if re.search(rb'(?m)^(?:<{7}|>{7}|={7}|\|{7})(?: |\r?$)', data):
+                  raise SystemExit(f'Conflict marker in {name}')
+              text.append(name)
+          pathlib.Path('/tmp/text-files').write_bytes(b'\0'.join(p.encode() for p in text))
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write('markdown<<MARKDOWN_FILES\n' + '\n'.join(p for p in text if p.endswith('.md')) + '\nMARKDOWN_FILES\n')
+          PY
+      - name: Install EditorConfig checker
+        run: go install github.com/editorconfig-checker/editorconfig-checker/v3/cmd/editorconfig-checker@v3.11.1
+      - name: Check EditorConfig on changed files
+        shell: bash
+        run: |
+          mapfile -d '' files < /tmp/text-files
+          if ((${#files[@]})); then "$(go env GOPATH)/bin/editorconfig-checker" "${files[@]}"; fi
+      - name: Check Markdown formatting
+        if: steps.files.outputs.markdown != ''
+        uses: DavidAnson/markdownlint-cli2-action@v24
+        with:
+          globs: ${{ steps.files.outputs.markdown }}

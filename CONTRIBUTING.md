@@ -44,4 +44,12 @@ on manual request; external outages may require a rerun. Dependabot proposes
 weekly GitHub Actions updates for review; updates are not automatically merged.
 See the release guide for the manually triggered draft-release workflow.
 
+Formatting CI checks changed text files for whitespace, conflict markers and
+EditorConfig compliance, and changed Markdown with markdownlint. It reports
+problems without rewriting files. Existing untouched files are not reformatted.
+Git keeps C# and PowerShell working files as CRLF; documentation and YAML use LF.
+The labeler adds `documentation`, `ui` and `maintenance` from changed paths using
+trusted base-branch configuration. It preserves manually assigned labels and
+never checks out or executes pull-request code.
+
 Open LeapworkBuildManager.sln for the production project. Use tests/Support for shared test helpers; register suites in scripts/build.ps1. See docs/RELEASING.md for packaging and CHANGELOG.md for release notes.

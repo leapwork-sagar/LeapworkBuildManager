@@ -25,6 +25,7 @@ jobs:
           $version = [regex]::Match($source, 'Number\s*=\s*"(\d+\.\d+\.\d+\.\d+)"').Groups[1].Value
           if (!$version) { throw 'VersionInfo.Number must have four numeric components.' }
           $tag = "v$version"
+          ./scripts/check-release.ps1 -Tag $tag
           $releaseTags = @(gh api --paginate "repos/$env:GITHUB_REPOSITORY/releases" --jq '.[].tag_name')
           if ($LASTEXITCODE -ne 0) { throw 'Could not inspect existing releases.' }
           if ($releaseTags -contains $tag) { throw "Release $tag already exists. Increment the version first." }
@@ -49,6 +50,7 @@ jobs:
           $exe = "releases/$env:RELEASE_TAG/LeapworkBuildManager.exe"
           $checksum = "releases/$env:RELEASE_TAG/SHA256SUMS.txt"
           ((Get-FileHash $exe -Algorithm SHA256).Hash + '  LeapworkBuildManager.exe') | Set-Content $checksum -Encoding ascii
+          ./scripts/check-release.ps1 -Tag $env:RELEASE_TAG -ExecutablePath $exe -ChecksumPath $checksum
           @'
           Portable Windows EXE. Requires .NET Framework 4.7.2 or later; runtime is not bundled. The executable is unsigned.
 
@@ -56,4 +58,3 @@ jobs:
           '@ | Set-Content releases/release-notes.md
           gh release create $env:RELEASE_TAG $exe $checksum --draft --target $env:GITHUB_SHA --title "Leapwork Build Manager $env:RELEASE_TAG" --generate-notes --notes-file releases/release-notes.md
           if ($LASTEXITCODE -ne 0) { throw 'Draft release creation failed; inspect GitHub Releases before retrying.' }
-
