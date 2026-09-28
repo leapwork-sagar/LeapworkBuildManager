@@ -1,7 +1,5 @@
 using System;
 using System.Drawing;
-using System.Diagnostics;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -24,10 +22,12 @@ namespace LeapworkBuildManager
             path = entry.DownloadPath;
             Text = "Saved installer";
             Font = Theme.CreateFont(10, FontStyle.Regular);
-            BackColor = Theme.Background; ForeColor = Theme.Text;
+            BackColor = Theme.Background;
+            ForeColor = Theme.Text;
             StartPosition = FormStartPosition.CenterParent;
             FormBorderStyle = FormBorderStyle.FixedDialog;
-            MaximizeBox = MinimizeBox = false; ShowInTaskbar = false;
+            MaximizeBox = MinimizeBox = false;
+            ShowInTaskbar = false;
             AutoScaleMode = AutoScaleMode.Dpi;
             ClientSize = new Size(540, 340);
             var layout = new TableLayoutPanel { Dock = DockStyle.Fill, Padding = new Padding(LayoutMetrics.PanelPadding), ColumnCount = 1, RowCount = 6 };
@@ -51,7 +51,8 @@ namespace LeapworkBuildManager
                 action.Size = new Size(TextRenderer.MeasureText(action.Text, action.Font).Width + action.Padding.Horizontal + 8, LayoutMetrics.ButtonHeight);
                 action.Margin = new Padding(0, 0, LayoutMetrics.Gap, 0);
             }
-            errorDetails.BackColor = Theme.Input; errorDetails.ForeColor = Theme.Text;
+            errorDetails.BackColor = Theme.Input;
+            errorDetails.ForeColor = Theme.Text;
             showDetails.LinkColor = Theme.Text;
             showDetails.LinkClicked += delegate
             {
@@ -61,7 +62,8 @@ namespace LeapworkBuildManager
             };
             layout.Controls.Add(showDetails, 0, 3);
             layout.Controls.Add(errorDetails, 0, 4);
-            layout.Controls.Add(actions, 0, 5); Controls.Add(layout);
+            layout.Controls.Add(actions, 0, 5);
+            Controls.Add(layout);
             CancelButton = close;
             Shown += async delegate
             {
@@ -76,30 +78,56 @@ namespace LeapworkBuildManager
 
         async Task RefreshAsync(bool openFolder)
         {
-            if (checking) return;
-            checking = true; open.Enabled = retry.Enabled = false;
+            if (checking)
+                return;
+            checking = true;
+            open.Enabled = retry.Enabled = false;
             status.Text = "Checking the saved location…";
-            showDetails.Visible = false; errorDetails.Visible = false;
+            showDetails.Visible = false;
+            errorDetails.Visible = false;
             ((TableLayoutPanel)errorDetails.Parent).RowStyles[4].Height = 0;
             showDetails.Text = "Show error details";
             try
             {
                 var result = await SavedInstallerService.InspectAsync(path, cancellation.Token);
-                if (IsDisposed || cancellation.IsCancellationRequested) return;
+                if (IsDisposed || cancellation.IsCancellationRequested)
+                    return;
                 open.Enabled = result == SavedInstallerState.Available;
                 retry.Visible = result == SavedInstallerState.Inaccessible;
-                status.Text = result == SavedInstallerState.Available ? "Installer found at its saved location." :
-                    result == SavedInstallerState.Missing ? "Installer not found at its saved location. It may have been moved or deleted." :
-                    "Couldn’t check the saved location. Reconnect the drive or check permissions, then retry.";
+                status.Text = DescribeInstallerState(result);
                 if (openFolder && result == SavedInstallerState.Available)
                     WindowsFileActions.OpenFolder(path);
             }
             catch (OperationCanceledException) { }
             catch (Exception error)
             {
-                if (!IsDisposed) { status.Text = "Couldn’t open or check the saved location. Retry, or view error details."; errorDetails.Text = error.Message; showDetails.Visible = true; retry.Visible = true; }
+                if (!IsDisposed)
+                {
+                    status.Text = "Couldn’t open or check the saved location. Retry, or view error details.";
+                    errorDetails.Text = error.Message;
+                    showDetails.Visible = true;
+                    retry.Visible = true;
+                }
             }
-            finally { checking = false; if (!IsDisposed) retry.Enabled = true; }
+            finally
+            {
+                checking = false;
+                if (!IsDisposed)
+                    retry.Enabled = true;
+            }
+        }
+
+        static string DescribeInstallerState(SavedInstallerState state)
+        {
+            switch (state)
+            {
+                case SavedInstallerState.Available:
+                    return "Installer found at its saved location.";
+                case SavedInstallerState.Missing:
+                    return "Installer not found at its saved location. It may have been moved or deleted.";
+                default:
+                    return "Couldn’t check the saved location. Reconnect the drive or check permissions, then retry.";
+            }
         }
 
         protected override void Dispose(bool disposing)
@@ -107,7 +135,8 @@ namespace LeapworkBuildManager
             if (disposing && !resourcesDisposed)
             {
                 resourcesDisposed = true;
-                cancellation.Cancel(); cancellation.Dispose();
+                cancellation.Cancel();
+                cancellation.Dispose();
             }
             base.Dispose(disposing);
         }
