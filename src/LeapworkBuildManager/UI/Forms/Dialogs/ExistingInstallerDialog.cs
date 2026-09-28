@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -66,6 +66,8 @@ namespace LeapworkBuildManager
             var exit = new SoftButton
             {
                 Text = "×",
+                SymbolOnly = true,
+                Padding = Padding.Empty,
                 Width = 44,
                 Dock = DockStyle.Right,
                 AutoSize = false,
@@ -80,13 +82,13 @@ namespace LeapworkBuildManager
             root = new TableLayoutPanel
             {
                 Dock = DockStyle.Fill,
-                Padding = new Padding(20, 12, 20, 16),
+                Padding = new Padding(LayoutMetrics.PanelPadding),
                 ColumnCount = 1,
                 RowCount = 2
             };
             root.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
             root.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
-            root.RowStyles.Add(new RowStyle(SizeType.Absolute, 64));
+            root.RowStyles.Add(new RowStyle(SizeType.Absolute, 48));
             content = new Panel
             {
                 Dock = DockStyle.Fill,
@@ -118,7 +120,9 @@ namespace LeapworkBuildManager
             location.Controls.Add(PathField(Path.GetDirectoryName(Destination), 58), 0, 0);
             var open = ChoiceButton("Open folder", ExistingInstallerChoice.OpenFolder);
             tips.SetToolTip(open, Path.GetDirectoryName(Destination));
-            open.Margin = new Padding(10, 9, 0, 15);
+            open.Dock = DockStyle.Top;
+            open.Height = LayoutMetrics.ButtonHeight;
+            open.Margin = new Padding(LayoutMetrics.Gap, 8, 0, 8);
             location.Controls.Add(open, 1, 0);
             body.Controls.Add(location);
             body.Controls.Add(new Label { Text = "Save another copy keeps both files with a numbered filename.", AutoSize = true, Dock = DockStyle.Top, Margin = new Padding(0, 0, 0, 10) });
@@ -130,7 +134,7 @@ namespace LeapworkBuildManager
                 Dock = DockStyle.Fill,
                 ColumnCount = 3,
                 RowCount = 1,
-                Padding = new Padding(0, 16, 0, 4),
+                Padding = new Padding(0, LayoutMetrics.PanelPadding, 0, 0),
                 Margin = Padding.Empty
             };
             footer.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 30));
@@ -142,8 +146,10 @@ namespace LeapworkBuildManager
             saveCopy = ChoiceButton("Save another copy", ExistingInstallerChoice.SaveCopy);
             saveCopy.BackColor = Theme.Accent;
             saveCopy.ForeColor = Theme.AccentText;
-            cancel.Margin = new Padding(0, 0, 10, 0);
-            replace.Margin = new Padding(0, 0, 10, 0);
+            cancel.Dock = replace.Dock = saveCopy.Dock = DockStyle.Top;
+            cancel.Height = replace.Height = saveCopy.Height = LayoutMetrics.ButtonHeight;
+            cancel.Margin = new Padding(0, 0, LayoutMetrics.Gap, 0);
+            replace.Margin = new Padding(0, 0, LayoutMetrics.Gap, 0);
             saveCopy.Margin = Padding.Empty;
             footer.Controls.Add(cancel, 0, 0);
             footer.Controls.Add(replace, 1, 0);
@@ -211,7 +217,7 @@ namespace LeapworkBuildManager
                 ForeColor = Theme.Text,
                 BorderStyle = BorderStyle.FixedSingle,
                 Margin = new Padding(0, 0, 0, 12),
-                ScrollBars = ScrollBars.None
+                ScrollBars = ScrollBars.Vertical
             };
             tips.SetToolTip(field, text);
             return field;

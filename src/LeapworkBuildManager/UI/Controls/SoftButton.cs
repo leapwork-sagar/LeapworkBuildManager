@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
@@ -8,6 +8,7 @@ namespace LeapworkBuildManager
     public sealed class SoftButton : Button
     {
         bool hover, pressed;
+        public bool SymbolOnly { get; set; }
         protected override void OnMouseEnter(EventArgs e)
         {
             base.OnMouseEnter(e);
@@ -44,9 +45,9 @@ namespace LeapworkBuildManager
             BackColor = Theme.Button;
             AutoSize = true;
             Padding = new Padding(12, 5, 12, 5);
-            Height = 36;
+            Height = LayoutMetrics.ButtonHeight;
             Cursor = Cursors.Hand;
-            Margin = new Padding(0, 0, 10, 0);
+            Margin = new Padding(0, 0, LayoutMetrics.Gap, 0);
         }
 
         protected override void OnPaint(PaintEventArgs e)
@@ -66,7 +67,8 @@ namespace LeapworkBuildManager
                     e.Graphics.FillPath(b, p);
             }
 
-            TextRenderer.DrawText(e.Graphics, Text, Font, ClientRectangle, Enabled ? ForeColor : Theme.DisabledText, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter);
+            var textBounds = SymbolOnly ? ClientRectangle : new Rectangle(Padding.Left, Padding.Top, Math.Max(0, ClientSize.Width - Padding.Horizontal), Math.Max(0, ClientSize.Height - Padding.Vertical));
+            TextRenderer.DrawText(e.Graphics, Text, Font, textBounds, Enabled ? ForeColor : Theme.DisabledText, TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.SingleLine | (SymbolOnly ? TextFormatFlags.NoPadding : TextFormatFlags.EndEllipsis));
             if (Focused)
                 using (var focusPen = new Pen(Theme.Focus, 2))
                     e.Graphics.DrawRectangle(focusPen, 3, 3, Width - 7, Height - 7);

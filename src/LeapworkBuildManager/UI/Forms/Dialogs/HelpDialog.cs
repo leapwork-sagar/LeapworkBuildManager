@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
@@ -148,6 +148,8 @@ namespace LeapworkBuildManager
             var exit = new SoftButton
             {
                 Text = "×",
+                SymbolOnly = true,
+                Padding = Padding.Empty,
                 Dock = DockStyle.Right,
                 Width = 44,
                 AutoSize = false,
@@ -170,7 +172,7 @@ namespace LeapworkBuildManager
             var root = new TableLayoutPanel
             {
                 Dock = DockStyle.Fill,
-                Padding = new Padding(16, 12, 16, 16),
+                Padding = new Padding(LayoutMetrics.PanelPadding),
                 ColumnCount = 1,
                 RowCount = 4,
                 Margin = Padding.Empty
@@ -179,7 +181,7 @@ namespace LeapworkBuildManager
             root.RowStyles.Add(new RowStyle(SizeType.Absolute, 76));
             root.RowStyles.Add(new RowStyle(SizeType.Absolute, 48));
             root.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
-            root.RowStyles.Add(new RowStyle(SizeType.Absolute, 64));
+            root.RowStyles.Add(new RowStyle(SizeType.Absolute, 48));
             var header = new TableLayoutPanel
             {
                 Dock = DockStyle.Fill,
@@ -223,7 +225,7 @@ namespace LeapworkBuildManager
             {
                 Dock = DockStyle.Fill,
                 BackColor = Theme.Surface,
-                Padding = new Padding(14),
+                Padding = new Padding(LayoutMetrics.PanelPadding),
                 Margin = Padding.Empty
             };
             pages.Controls.Add(helpPage);
@@ -235,7 +237,7 @@ namespace LeapworkBuildManager
                 Dock = DockStyle.Fill,
                 ColumnCount = 3,
                 RowCount = 1,
-                Padding = new Padding(0, 12, 0, 8),
+                Padding = new Padding(0, LayoutMetrics.PanelPadding, 0, 0),
                 Margin = Padding.Empty
             };
             footer.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
@@ -243,8 +245,9 @@ namespace LeapworkBuildManager
             footer.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 178));
             footer.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 108));
             footerLayout = footer;
-            copy.Dock = closeButton.Dock = DockStyle.Fill;
-            copy.Margin = closeButton.Margin = new Padding(4, 0, 0, 0);
+            copy.Dock = closeButton.Dock = DockStyle.Top;
+            copy.Height = closeButton.Height = LayoutMetrics.ButtonHeight;
+            copy.Margin = closeButton.Margin = new Padding(LayoutMetrics.Gap, 0, 0, 0);
             footer.Controls.Add(copy, 1, 0);
             footer.Controls.Add(closeButton, 2, 0);
             root.Controls.Add(footer, 0, 3);
@@ -383,7 +386,7 @@ namespace LeapworkBuildManager
             var panel = new Panel
             {
                 Dock = DockStyle.Fill,
-                Margin = new Padding(0, 0, 10, 6)
+                Margin = new Padding(0, 0, LayoutMetrics.Gap, 6)
             };
             button.Dock = DockStyle.Fill;
             button.AccessibleRole = AccessibleRole.PageTab;
@@ -415,6 +418,7 @@ namespace LeapworkBuildManager
                 Text = text,
                 ReadOnly = true,
                 Multiline = multiline,
+                ScrollBars = multiline ? ScrollBars.Vertical : ScrollBars.None,
                 Dock = DockStyle.Fill,
                 BackColor = Theme.Input,
                 ForeColor = Theme.Text,
@@ -479,7 +483,7 @@ namespace LeapworkBuildManager
                 Text = "Show full URL",
                 AutoSize = false,
                 Dock = DockStyle.Fill,
-                Margin = new Padding(0, 0, Px(8), Px(10)),
+                Margin = new Padding(0, 0, Px(LayoutMetrics.Gap), Px(LayoutMetrics.Gap)),
                 Enabled = !String.IsNullOrEmpty(fullUrl)
             };
             var copyUrl = new SoftButton
@@ -487,7 +491,7 @@ namespace LeapworkBuildManager
                 Text = "Copy URL",
                 AutoSize = false,
                 Dock = DockStyle.Fill,
-                Margin = new Padding(0, 0, 0, Px(10)),
+                Margin = new Padding(0, 0, 0, Px(LayoutMetrics.Gap)),
                 Enabled = !String.IsNullOrEmpty(fullUrl)
             };
             tips.SetToolTip(reveal, "Expand the complete download address.");
@@ -577,7 +581,7 @@ namespace LeapworkBuildManager
                     actions.Controls.Add(copyUrl, 2, 0);
                     content.Controls.Add(actions, 0, 1);
                 }
-                linkHeading.Margin = compact ? Padding.Empty : new Padding(0, 0, Px(8), Px(10));
+                linkHeading.Margin = compact ? Padding.Empty : new Padding(0, 0, Px(LayoutMetrics.Gap), Px(LayoutMetrics.Gap));
                 actions.ResumeLayout(true);
                 content.ResumeLayout(true);
             };
@@ -603,6 +607,7 @@ namespace LeapworkBuildManager
         {
             EnsureDiagnostics();
             linkExpanded = !linkExpanded;
+            ((TableLayoutPanel)link.Parent).RowStyles[3].Height = Px(linkExpanded ? 90 : 42);
             tips.SetToolTip(reveal, linkExpanded ? "Show only the installer filename." : "Expand the complete download address.");
             link.Text = linkExpanded ? fullUrl : ShortUrl(fullUrl);
             reveal.Text = linkExpanded ? "Hide full URL" : "Show full URL";

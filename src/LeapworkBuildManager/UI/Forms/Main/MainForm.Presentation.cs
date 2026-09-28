@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
@@ -34,7 +34,7 @@ namespace LeapworkBuildManager
                 MinimizeBox = false,
                 ShowInTaskbar = false,
                 StartPosition = FormStartPosition.CenterParent,
-                ClientSize = new Size(460, 194),
+                ClientSize = new Size(480, 180),
                 BackColor = BackColor,
                 ForeColor = ForeColor,
                 Font = Font
@@ -61,12 +61,12 @@ namespace LeapworkBuildManager
                     Text = "A download is still in progress",
                     Font = LauncherFont(12, FontStyle.Bold)
                 };
-                Place(dialog, title, 20, 18, 420, 30);
+                Place(dialog, title, 16, 16, 448, 30);
                 var detail = new Label
                 {
                     Text = "Closing will cancel the download and remove the partial file. Do you want to close the launcher?"
                 };
-                Place(dialog, detail, 20, 58, 420, 57);
+                Place(dialog, detail, 16, 58, 448, 57);
                 var keep = new SoftButton
                 {
                     Text = "Keep downloading",
@@ -77,8 +77,8 @@ namespace LeapworkBuildManager
                     Text = "Cancel download && close",
                     DialogResult = DialogResult.OK
                 };
-                Place(dialog, keep, 20, 132, 187, 40);
-                Place(dialog, stop, 218, 132, 222, 40);
+                Place(dialog, keep, 16, 132, 200, 32);
+                Place(dialog, stop, 228, 132, 236, 32);
                 dialog.AcceptButton = keep;
                 dialog.CancelButton = keep;
                 return dialog.ShowDialog(this) == DialogResult.OK;

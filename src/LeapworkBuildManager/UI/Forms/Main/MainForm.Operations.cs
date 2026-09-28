@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Threading;
 using System.Threading.Tasks;
@@ -197,7 +197,7 @@ namespace LeapworkBuildManager
             if (folder.ContainsFocus && !ui.CanOpenFolder)
                 ActiveControl = ui.Busy ? (Control)cancel : build;
             folder.Enabled = ui.CanOpenFolder;
-            folder.Size = ui.CanOpenFolder ? new Size(Px(132), Px(36)) : Size.Empty;
+            folder.Size = ui.CanOpenFolder ? new Size(Px(132), Px(LayoutMetrics.ButtonHeight)) : Size.Empty;
             eta.Visible = !ui.Completed;
             UpdateActionTooltips();
             ReflowDownloadPanel();
@@ -222,8 +222,14 @@ namespace LeapworkBuildManager
             SelectedBuildType = "Experimental";
             inferredRuntime = 0;
             restoring = false;
+            var area = WorkingAreaProvider();
             RefreshHistory();
             Changed();
+            // Finish the collapsed layout before centering so the final window stays centered.
+            expandTimer.Stop();
+            panelHeight = expansionTarget = 0;
+            ReflowDownloadPanel();
+            Location = WindowLayoutPlan.Center(area, Size);
             SavePreferences();
             build.Focus();
         }

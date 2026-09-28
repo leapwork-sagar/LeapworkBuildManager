@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -101,10 +101,15 @@ namespace LeapworkBuildManager
             var area = WorkingAreaProvider();
             var ui = UiModel;
             bool completedLayout = ui.Completed || appState == ApplicationState.Preparing && controller.CompletedDownload != null;
-            bool narrow = Math.Min(Px(620), area.Width) < Px(560);
-            int detailHeight = narrow ? (advancedMode ? 256 : 192) : (advancedMode ? 184 : 128);
+            bool narrow = Math.Min(Px(LayoutMetrics.CanvasWidth), area.Width) < Px(560);
+            int actionTop = narrow ? 155 : 110;
+            int actionHeight = LayoutMetrics.ButtonHeight;
+            int detailHeight = actionTop + actionHeight + 16 + (advancedMode ? (narrow ? 70 : 44) : 0);
             int rowHeight = narrow ? 52 : 36;
-            int resultHeight = matches.Items.Count > 0 ? 44 + matches.Items.Count * rowHeight : 72;
+            int summaryWidth = Math.Max(Px(80), Math.Min(Px(LayoutMetrics.CanvasWidth), area.Width) - Px(80) - SystemInformation.VerticalScrollBarWidth);
+            int summaryHeight = Math.Max(Px(24), TextRenderer.MeasureText(resultSummary.Text, resultSummary.Font, new Size(summaryWidth, int.MaxValue), TextFormatFlags.WordBreak).Height);
+            int resultHeader = (int)Math.Ceiling(summaryHeight / layoutScale) + 28;
+            int resultHeight = Math.Max(72, matches.Items.Count == 0 ? resultHeader : resultHeader + matches.Items.Count * rowHeight + 16);
             var sections = new Control[]
             {
                 details,
@@ -122,10 +127,10 @@ namespace LeapworkBuildManager
                 resultHeight,
                 42,
                 32,
-                112,
+                122,
                 28,
                 expandTimer.Enabled ? animationReservedHeight : panelHeight,
-                82
+                84
             };
             var visible = new bool[]
             {
@@ -141,7 +146,7 @@ namespace LeapworkBuildManager
             int logicalHeight = 94;
             for (int i = 0; i < heights.Length; i++)
                 if (visible[i])
-                    logicalHeight += heights[i] + 12;
+                    logicalHeight += heights[i] + LayoutMetrics.Gap;
             var plan = WindowLayoutPlan.Calculate(area, layoutScale, logicalHeight, SystemInformation.VerticalScrollBarWidth);
             int scrollY = -viewport.AutoScrollPosition.Y;
             applyingLayout = true;
@@ -159,51 +164,51 @@ namespace LeapworkBuildManager
                 canvas.Anchor = AnchorStyles.Top | AnchorStyles.Left;
                 canvas.SetBounds(0, 0, plan.CanvasWidth, plan.ContentHeight);
                 int y = 90;
-                int width = Math.Max(Px(100), plan.CanvasWidth - Px(48));
+                int width = Math.Max(Px(100), plan.CanvasWidth - Px(LayoutMetrics.Margin * 2));
                 for (int i = 0; i < sections.Length; i++)
                 {
                     sections[i].Visible = visible[i];
-                    sections[i].SetBounds(Px(24), Px(y), width, Px(heights[i]));
+                    sections[i].SetBounds(Px(LayoutMetrics.Margin), Px(y), width, Px(heights[i]));
                     if (visible[i])
-                        y += heights[i] + 12;
+                        y += heights[i] + LayoutMetrics.Gap;
                 }
 
                 if (expandTimer.Enabled)
                     animationHistoryTop = historyCard.Top;
                 int inner = width - Px(32);
-                build.SetBounds(Px(16), Px(38), narrow ? inner : (inner - Px(12)) * 56 / 100, Px(27));
-                check.SetBounds(narrow ? Px(16) : build.Right + Px(12), Px(narrow ? 74 : 32), narrow ? inner : inner - build.Width - Px(12), Px(39));
-                validation.SetBounds(Px(16), Px(narrow ? 116 : 71), inner, Px(23));
-                advanced.SetBounds(Px(16), Px(narrow ? 144 : 96), Math.Max(Px(80), inner - Px(114)), Px(28));
-                reset.SetBounds(width - Px(118), advanced.Top, Px(102), Px(28));
+                build.SetBounds(Px(LayoutMetrics.PanelPadding), Px(38), narrow ? inner : (inner - Px(LayoutMetrics.Gap)) * 56 / 100, Px(27));
+                check.SetBounds(narrow ? Px(LayoutMetrics.PanelPadding) : build.Right + Px(LayoutMetrics.Gap), Px(narrow ? 74 : 32), narrow ? inner : inner - build.Width - Px(LayoutMetrics.Gap), Px(39));
+                validation.SetBounds(Px(LayoutMetrics.PanelPadding), Px(narrow ? 116 : 71), inner, Px(23));
+                advanced.SetBounds(Px(LayoutMetrics.PanelPadding), Px(actionTop), Math.Max(Px(80), inner - Px(114)), Px(actionHeight));
+                reset.SetBounds(width - Px(118), advanced.Top, Px(102), Px(actionHeight));
                 if (type != null)
                 {
-                    typeLabel.SetBounds(Px(16), Px(narrow ? 184 : 140), Px(90), Px(24));
-                    type.SetBounds(Px(narrow ? 16 : 110), Px(narrow ? 210 : 136), narrow ? inner : width - Px(126), Px(28));
+                    typeLabel.SetBounds(Px(LayoutMetrics.PanelPadding), Px(actionTop + actionHeight + (narrow ? 16 : 20)), Px(90), Px(24));
+                    type.SetBounds(Px(narrow ? 16 : 110), Px(actionTop + actionHeight + (narrow ? 42 : 16)), narrow ? inner : width - Px(126), Px(28));
                 }
 
-                resultSummary.Height = Px(matches.Items.Count > 0 ? 24 : 52);
+                resultSummary.Height = summaryHeight;
                 matches.Visible = matches.Items.Count > 0;
                 matches.ItemHeight = Px(rowHeight);
-                matches.Top = Px(38);
+                matches.Top = Px(resultHeader);
                 matches.Height = Px(matches.Items.Count * rowHeight);
-                downloadIdentity.SetBounds(Px(16), Px(14), Math.Max(Px(50), inner - Px(148)), Px(36));
+                downloadIdentity.SetBounds(Px(LayoutMetrics.PanelPadding), Px(14), Math.Max(Px(50), inner - Px(148)), Px(36));
                 downloadIdentity.TextAlign = ContentAlignment.MiddleLeft;
                 folder.Location = cancel.Location = new Point(width - Px(148), Px(14));
-                percentage.SetBounds(Px(16), Px(58), inner, Px(24));
+                percentage.SetBounds(Px(LayoutMetrics.PanelPadding), Px(58), inner, Px(24));
                 bar.Top = Px(92);
                 status.Top = Px(110);
                 eta.Top = Px(140);
-                destinationLabel.SetBounds(Px(16), Px(completedLayout ? 146 : 170), Math.Max(Px(40), inner - Px(148)), Px(44));
+                destinationLabel.SetBounds(Px(LayoutMetrics.PanelPadding), Px(completedLayout ? 146 : 170), Math.Max(Px(40), inner - Px(148)), Px(44));
                 copyFolderPath.SetBounds(width - Px(156), destinationLabel.Top, Px(140), Px(32));
-                open.Left = Px(ui.ShowCopy ? 134 : 14);
-                recent.SetBounds(Px(16), Px(38), Math.Max(Px(40), inner - Px(140)), Px(28));
-                clearHistory.SetBounds(width - Px(144), Px(34), Px(128), Px(36));
+                open.Left = Px(ui.ShowCopy ? 138 : 16);
+                recent.SetBounds(Px(LayoutMetrics.PanelPadding), Px(38), Math.Max(Px(40), inner - Px(140)), Px(28));
+                clearHistory.SetBounds(width - Px(144), Px(36), Px(128), Px(LayoutMetrics.ButtonHeight));
                 titleBar.SetBounds(0, 0, ClientSize.Width, Px(34));
                 close.SetBounds(titleBar.Width - Px(44), Px(2), Px(40), Px(30));
                 minimize.SetBounds(close.Left - Px(44), Px(2), Px(40), Px(30));
                 help.SetBounds(minimize.Left - Px(124), Px(2), Px(116), Px(30));
-                titleCaption.SetBounds(Px(16), Px(8), Math.Max(0, help.Left - Px(24)), Px(22));
+                titleCaption.SetBounds(Px(LayoutMetrics.PanelPadding), Px(8), Math.Max(0, help.Left - Px(24)), Px(22));
                 viewport.AutoScroll = true;
                 viewport.AutoScrollMinSize = new Size(0, plan.ContentHeight);
             }
