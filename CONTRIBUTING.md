@@ -52,4 +52,9 @@ The labeler adds `documentation`, `ui` and `maintenance` from changed paths usin
 trusted base-branch configuration. It preserves manually assigned labels and
 never checks out or executes pull-request code.
 
+Merging requires Windows tests (`test`), Formatting (`format`), Documentation links
+(`links`) and Workflow validation (`workflows`). Workflow validation runs actionlint
+against all workflow files on every PR, so its required check is never path-skipped.
+GitHub automatically deletes merged PR source branches; local branches remain.
+
 Open LeapworkBuildManager.sln for the production project. Use tests/Support for shared test helpers; register suites in scripts/build.ps1. See docs/RELEASING.md for packaging and CHANGELOG.md for release notes.

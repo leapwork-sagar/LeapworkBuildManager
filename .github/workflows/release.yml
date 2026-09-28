@@ -51,10 +51,6 @@ jobs:
           $checksum = "releases/$env:RELEASE_TAG/SHA256SUMS.txt"
           ((Get-FileHash $exe -Algorithm SHA256).Hash + '  LeapworkBuildManager.exe') | Set-Content $checksum -Encoding ascii
           ./scripts/check-release.ps1 -Tag $env:RELEASE_TAG -ExecutablePath $exe -ChecksumPath $checksum
-          @'
-          Portable Windows EXE. Requires .NET Framework 4.7.2 or later; runtime is not bundled. The executable is unsigned.
-
-          Maintainer: review generated notes, checksums and manual download, sleep/wake and display-scaling checks before publishing this draft.
-          '@ | Set-Content releases/release-notes.md
+          Copy-Item docs/RELEASE_TEMPLATE.md releases/release-notes.md
           gh release create $env:RELEASE_TAG $exe $checksum --draft --target $env:GITHUB_SHA --title "Leapwork Build Manager $env:RELEASE_TAG" --generate-notes --notes-file releases/release-notes.md
           if ($LASTEXITCODE -ne 0) { throw 'Draft release creation failed; inspect GitHub Releases before retrying.' }

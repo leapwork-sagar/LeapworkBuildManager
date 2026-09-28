@@ -45,3 +45,7 @@ Historical headings such as `v1.22` mean `1.22.0.0`; nonzero patch/revision valu
 must be included. Run `scripts/check-release.ps1` with `-Tag` and optionally both
 `-ExecutablePath` and `-ChecksumPath` to perform the same checks locally.
 Windows CI tests rejection of invalid release metadata and assets.
+
+Drafts start with [the release template](RELEASE_TEMPLATE.md): Improvements,
+Fixes, Requirements and Known limitations, followed by generated PR/commit notes.
+Replace placeholder bullets and review all sections before publishing.
