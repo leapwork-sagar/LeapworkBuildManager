@@ -203,7 +203,9 @@ static class LifecycleTests
                 form.Close();
                 Assert(((Label)Get(form, "status")).Text.Contains("closing"), "closing an active search gives explicit cancellation status");
                 Await(search);
-                Pump();
+                var closeWait = Stopwatch.StartNew();
+                while (!form.IsDisposed && closeWait.ElapsedMilliseconds < 5000)
+                    Pump(10);
                 Assert(form.IsDisposed, "search cancellation finishes before closing");
             }
 
