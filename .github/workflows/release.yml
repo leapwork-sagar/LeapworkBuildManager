@@ -7,15 +7,21 @@ concurrency:
   group: prepare-release
   cancel-in-progress: false
 jobs:
-  release:
+  build:
     if: github.ref == 'refs/heads/main'
     runs-on: windows-latest
     timeout-minutes: 20
     permissions:
-      contents: write
+      contents: read
+    outputs:
+      release_tag: ${{ steps.version.outputs.release_tag }}
+      artifact_id: ${{ steps.upload.outputs.artifact-id }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - name: Validate version and prevent replacing an existing release
+        id: version
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
@@ -33,6 +39,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw 'Could not inspect existing tags.' }
           if ($tags -contains $tag) { throw "Tag $tag already exists. Use a new version so the draft points to this tested commit." }
           "RELEASE_TAG=$tag" >> $env:GITHUB_ENV
+          "release_tag=$tag" >> $env:GITHUB_OUTPUT
       - name: Build, test and package portable application
         shell: pwsh
         run: ./scripts/release.ps1
@@ -41,16 +48,62 @@ jobs:
         run: |
           & "$env:WINDIR/Microsoft.NET/Framework64/v4.0.30319/MSBuild.exe" src/LeapworkBuildManager/LeapworkBuildManager.csproj /t:Rebuild /p:Configuration=Release /verbosity:minimal
           if ($LASTEXITCODE -ne 0) { throw 'MSBuild failed' }
-      - name: Generate checksum and draft release
+      - name: Validate release assets
         shell: pwsh
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: |
           $ErrorActionPreference = 'Stop'
           $exe = "releases/$env:RELEASE_TAG/LeapworkBuildManager.exe"
           $checksum = "releases/$env:RELEASE_TAG/SHA256SUMS.txt"
-          ((Get-FileHash $exe -Algorithm SHA256).Hash + '  LeapworkBuildManager.exe') | Set-Content $checksum -Encoding ascii
+          $manifest = (Get-FileHash $exe -Algorithm SHA256).Hash + "  LeapworkBuildManager.exe`n"
+          [IO.File]::WriteAllText($checksum, $manifest, [Text.Encoding]::ASCII)
           ./scripts/check-release.ps1 -Tag $env:RELEASE_TAG -ExecutablePath $exe -ChecksumPath $checksum
-          Copy-Item docs/RELEASE_TEMPLATE.md releases/release-notes.md
-          gh release create $env:RELEASE_TAG $exe $checksum --draft --target $env:GITHUB_SHA --title "Leapwork Build Manager $env:RELEASE_TAG" --generate-notes --notes-file releases/release-notes.md
-          if ($LASTEXITCODE -ne 0) { throw 'Draft release creation failed; inspect GitHub Releases before retrying.' }
+          Copy-Item docs/RELEASE_TEMPLATE.md "releases/$env:RELEASE_TAG/release-notes.md"
+      - name: Transfer validated release files
+        id: upload
+        uses: actions/upload-artifact@v7
+        with:
+          name: release-${{ github.sha }}
+          path: |
+            releases/${{ steps.version.outputs.release_tag }}/LeapworkBuildManager.exe
+            releases/${{ steps.version.outputs.release_tag }}/SHA256SUMS.txt
+            releases/${{ steps.version.outputs.release_tag }}/release-notes.md
+          if-no-files-found: error
+          retention-days: 7
+  publish:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    steps:
+      # Do not check out or execute repository code in this privileged job.
+      - name: Retrieve this run's validated artifact
+        uses: actions/download-artifact@v8
+        with:
+          artifact-ids: ${{ needs.build.outputs.artifact_id }}
+          path: release
+          merge-multiple: true
+          digest-mismatch: error
+      - name: Verify transferred checksum
+        shell: bash
+        working-directory: release
+        run: |
+          set -euo pipefail
+          test -f LeapworkBuildManager.exe
+          test -f release-notes.md
+          test "$(wc -l < SHA256SUMS.txt)" -eq 1
+          grep -Eq '^[0-9A-Fa-f]{64}  LeapworkBuildManager[.]exe$' SHA256SUMS.txt
+          sha256sum --check --strict SHA256SUMS.txt
+      - name: Create draft release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ needs.build.outputs.release_tag }}
+        run: |
+          set -euo pipefail
+          [[ "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]
+          gh release create "$RELEASE_TAG" release/LeapworkBuildManager.exe release/SHA256SUMS.txt \
+            --draft --target "$GITHUB_SHA" --title "Leapwork Build Manager $RELEASE_TAG" \
+            --generate-notes --notes-file release/release-notes.md

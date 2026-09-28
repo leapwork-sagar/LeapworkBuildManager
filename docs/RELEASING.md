@@ -49,3 +49,17 @@ Windows CI tests rejection of invalid release metadata and assets.
 Drafts start with [the release template](RELEASE_TEMPLATE.md): Improvements,
 Fixes, Requirements and Known limitations, followed by generated PR/commit notes.
 Replace placeholder bullets and review all sections before publishing.
+
+## Release workflow permissions
+
+The build job has read-only repository access. It builds and tests the app, validates
+release metadata and transfers only the EXE, checksum and notes as a workflow artifact.
+The publish job downloads that exact artifact by ID from the same run and checks its
+digest and SHA-256 manifest before creating a draft. Only this job has `contents: write`;
+it does not check out or execute repository code. All checkouts disable persisted
+credentials and use the Node.js 24-based checkout action.
+
+Release immutability is enabled in repository settings. New releases become immutable
+when published: prepare all assets in the draft and verify them before publishing.
+Correct a published binary with a new version rather than replacing its asset or tag.
+This setting does not retroactively lock releases published before it was enabled.
