@@ -63,3 +63,23 @@ Release immutability is enabled in repository settings. New releases become immu
 when published: prepare all assets in the draft and verify them before publishing.
 Correct a published binary with a new version rather than replacing its asset or tag.
 This setting does not retroactively lock releases published before it was enabled.
+
+## Provenance and release source
+
+Use **Prepare draft release** for future public releases. Review and publish its draft;
+do not replace its tested EXE with a local build. The publishing job verifies the
+transferred checksum, creates GitHub build provenance, verifies the signed bundle,
+and attaches `LeapworkBuildManager.exe.sigstore.json` alongside the EXE and checksum.
+A failed attestation or verification prevents draft creation. The build job retains
+read-only repository permissions; signing permissions are restricted to the publish job.
+
+Verify a future attested download using the GitHub CLI:
+
+```text
+gh attestation verify LeapworkBuildManager.exe --repo leapwork-sagar/LeapworkBuildManager --bundle LeapworkBuildManager.exe.sigstore.json
+```
+
+The record identifies the release workflow and source commit. It is not an Authenticode
+signature and does not remove Windows reputation warnings. Older releases are not
+retroactively attested. Update the four-part version and changelog before running the
+workflow; published versions remain immutable.

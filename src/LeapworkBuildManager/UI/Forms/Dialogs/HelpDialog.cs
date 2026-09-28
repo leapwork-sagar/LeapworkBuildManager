@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace LeapworkBuildManager
 {
-    public sealed class HelpDialog : Form
+    public sealed class HelpDialog : DpiAwareForm
     {
         readonly SoftButton helpTab = new SoftButton
         {
@@ -363,6 +363,13 @@ namespace LeapworkBuildManager
             SelectHelp();
         }
 
+        protected override float LayoutScale { get { return scale; } }
+        protected override void OnDisplayScaleChanged(float value)
+        {
+            scale = value;
+            FitToArea(Screen.FromRectangle(Bounds).WorkingArea);
+        }
+
         public void FitToArea(Rectangle area)
         {
             SuspendLayout();
@@ -539,77 +546,7 @@ namespace LeapworkBuildManager
                         log.SelectionFont = bold;
                     log.Select(log.TextLength, 0);
                     log.SelectionColor = Theme.Text;
-                    log.SelectionFont = Font;
-                }
-
-            log.Select(0, 0);
-            log.ScrollToCaret();
-            tips.SetToolTip(log, "Copy diagnostics removes URL credentials and query values; folder paths can also be hidden.");
-            content.Controls.Add(log, 0, 5);
-            bool? compactLinkActions = null;
-            Action arrangeLinkActions = delegate
-            {
-                bool compact = content.ClientSize.Width < Px(470);
-                if (compactLinkActions == compact)
-                    return;
-                compactLinkActions = compact;
-                content.SuspendLayout();
-                actions.SuspendLayout();
-                actions.Controls.Clear();
-                content.Controls.Remove(linkHeading);
-                content.Controls.Remove(actions);
-                actions.ColumnStyles.Clear();
-                content.RowStyles[1].Height = Px(compact ? 24 : 44);
-                content.RowStyles[2].Height = Px(compact ? 44 : 0);
-                if (compact)
-                {
-                    actions.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, Px(140)));
-                    actions.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, Px(140)));
-                    actions.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-                    content.Controls.Add(linkHeading, 0, 1);
-                    actions.Controls.Add(reveal, 0, 0);
-                    actions.Controls.Add(copyUrl, 1, 0);
-                    content.Controls.Add(actions, 0, 2);
-                }
-                else
-                {
-                    actions.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-                    actions.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, Px(140)));
-                    actions.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, Px(140)));
-                    actions.Controls.Add(linkHeading, 0, 0);
-                    actions.Controls.Add(reveal, 1, 0);
-                    actions.Controls.Add(copyUrl, 2, 0);
-                    content.Controls.Add(actions, 0, 1);
-                }
-                linkHeading.Margin = compact ? Padding.Empty : new Padding(0, 0, Px(LayoutMetrics.Gap), Px(LayoutMetrics.Gap));
-                actions.ResumeLayout(true);
-                content.ResumeLayout(true);
-            };
-            content.SizeChanged += delegate { arrangeLinkActions(); };
-            diagnosticsPage.Controls.Add(content);
-            arrangeLinkActions();
-            diagnosticsPage.SizeChanged += delegate
-            {
-                content.Height = Math.Max(Px(300), diagnosticsPage.ClientSize.Height);
-            };
-            content.Height = Math.Max(Px(300), diagnosticsPage.ClientSize.Height);
-        }
-
-        public static string ShortUrl(string value)
-        {
-            if (String.IsNullOrWhiteSpace(value))
-                return "No download link generated";
-            Uri uri;
-            return Uri.TryCreate(value, UriKind.Absolute, out uri) ? Uri.UnescapeDataString(Path.GetFileName(uri.LocalPath)) : value;
-        }
-
-        public void ToggleUrl()
-        {
-            EnsureDiagnostics();
-            linkExpanded = !linkExpanded;
-            ((TableLayoutPanel)link.Parent).RowStyles[3].Height = Px(linkExpanded ? 90 : 42);
-            tips.SetToolTip(reveal, linkExpanded ? "Show only the installer filename." : "Expand the complete download address.");
-            link.Text = linkExpanded ? fullUrl : ShortUrl(fullUrl);
+                    log.SelectionFont = …887 tokens truncated…rtUrl(fullUrl);
             reveal.Text = linkExpanded ? "Hide full URL" : "Show full URL";
         }
 

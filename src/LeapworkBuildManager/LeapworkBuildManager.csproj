@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
+    <Compile Include="UI\Styling\DpiAwareForm.cs" />
     <Compile Include="Services\WindowsFileActions.cs" />
     <Compile Include="Services\SavedInstallerService.cs" />
     <Compile Include="UI\Forms\Dialogs\SavedInstallerDialog.cs" />

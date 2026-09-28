@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace LeapworkBuildManager
 {
-    internal sealed class SavedInstallerDialog : Form
+    internal sealed class SavedInstallerDialog : DpiAwareForm
     {
         readonly string path;
         readonly TextBox errorDetails = new TextBox { ReadOnly = true, Multiline = true, ScrollBars = ScrollBars.Vertical, Dock = DockStyle.Fill, Visible = false };
@@ -28,7 +28,7 @@ namespace LeapworkBuildManager
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = MinimizeBox = false;
             ShowInTaskbar = false;
-            AutoScaleMode = AutoScaleMode.Dpi;
+            AutoScaleMode = AutoScaleMode.None;
             ClientSize = new Size(540, 340);
             var layout = new TableLayoutPanel { Dock = DockStyle.Fill, Padding = new Padding(LayoutMetrics.PanelPadding), ColumnCount = 1, RowCount = 6 };
             layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));

@@ -27,3 +27,11 @@ jobs:
       - name: Test release consistency checks
         shell: pwsh
         run: ./scripts/test-release-check.ps1
+      - name: Retain regression reports and window captures
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-results-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/test-results/
+          if-no-files-found: warn
+          retention-days: 14

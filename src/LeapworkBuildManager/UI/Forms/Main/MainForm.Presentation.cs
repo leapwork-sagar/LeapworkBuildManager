@@ -26,9 +26,10 @@ namespace LeapworkBuildManager
 
         bool ShowCloseWarning()
         {
-            using (var dialog = new Form
+            using (var dialog = new DpiAwareForm
             {
                 Text = "Download in progress",
+                AutoScaleMode = AutoScaleMode.None,
                 FormBorderStyle = FormBorderStyle.FixedDialog,
                 MaximizeBox = false,
                 MinimizeBox = false,

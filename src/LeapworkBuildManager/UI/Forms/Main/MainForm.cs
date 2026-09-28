@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace LeapworkBuildManager
 {
-    public sealed partial class MainForm : Form
+    public sealed partial class MainForm : DpiAwareForm
     {
         readonly TextBox build = new BuildNumberBox
         {
