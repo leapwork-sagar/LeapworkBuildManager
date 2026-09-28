@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Threading;
@@ -44,7 +44,7 @@ namespace LeapworkBuildManager
         readonly Card historyCard = new Card(), progressCard = new Card(), details = new Card(), resultsCard = new Card(), linkCard = new Card();
         readonly Panel titleBar = new Panel();
         readonly Label titleCaption = new Label();
-        readonly Button minimize = new SoftButton(), close = new SoftButton();
+        readonly Button minimize = new SoftButton { SymbolOnly = true, Padding = Padding.Empty }, close = new SoftButton { SymbolOnly = true, Padding = Padding.Empty };
         bool downloading
         {
             get

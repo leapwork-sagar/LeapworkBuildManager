@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.IO;
@@ -145,6 +145,10 @@ static class LifecycleTests
                 var viewport = (Panel)Get(form, "viewport");
                 Assert(!viewport.HorizontalScroll.Visible && !viewport.VerticalScroll.Visible, "Advanced expansion has no scrollbars when content fits");
                 Assert(form.Location == moved, "later expansion preserves user window position");
+                ((Button)Get(form, "reset")).PerformClick();
+                Pump(250);
+                Assert(form.Location == WindowLayoutPlan.Center(work, form.Size), "Reset centers final layout in current work area");
+                Assert(((SoftButton)Get(form, "minimize")).SymbolOnly && ((SoftButton)Get(form, "close")).SymbolOnly, "title-bar controls use symbol rendering");
                 ((Button)Get(form, "advanced")).PerformClick();
                 Pump(250);
                 Assert(!viewport.HorizontalScroll.Visible && !viewport.VerticalScroll.Visible, "collapse clears unused scrollbars");
@@ -165,6 +169,13 @@ static class LifecycleTests
                     var detail = (Panel)Get(form, "details");
                     var build = (Control)Get(form, "build");
                     var check = (Control)Get(form, "check");
+                    var summary = (Label)Get(form, "resultSummary");
+                    summary.Text = new string('W', 150) + " — checks failed; retry search for full availability.";
+                    Call(form, "ReflowDownloadPanel");
+                    Pump();
+                    var needed = TextRenderer.MeasureText(summary.Text, summary.Font, new Size(summary.Width, int.MaxValue), TextFormatFlags.WordBreak);
+                    Assert(summary.Height >= needed.Height && summary.Bottom <= summary.Parent.Height, "long summary stays readable at " + scale);
+                    Assert(((TextBox)Get(form, "url")).ScrollBars == ScrollBars.Vertical, "long download URL remains scrollable");
                     Assert(build.Right <= detail.Width && check.Right <= detail.Width && !build.Bounds.IntersectsWith(check.Bounds), "narrow build input and search action do not overlap at " + scale);
                 }
 

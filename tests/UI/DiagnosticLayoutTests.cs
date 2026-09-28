@@ -10,7 +10,7 @@ class DiagnosticLayoutTests
     [STAThread] static void Main()
     {
         Application.EnableVisualStyles();
-        using(var dialog = new HelpDialog(null,"2024.1.486","Ready to download.","https://sawindowreleasedata.blob.core.windows.net/Leapwork_Release_x64_2024.1.486.msi",new DiagnosticEvent[0],"Report"))
+        using(var dialog = new HelpDialog(null,"2024.1.486","Ready to download.","https://sawindowreleasedata.blob.core.windows.net/" + new string('x', 600) + "/Leapwork_Release_x64_2024.1.486.msi",new DiagnosticEvent[0],"Report"))
         {
             dialog.Show(); dialog.SelectDiagnostics();
             foreach(int width in new[]{660,440,660})
@@ -20,10 +20,15 @@ class DiagnosticLayoutTests
                 var reveal=controls.First(c=>c.Text=="Show full URL");
                 var copy=controls.First(c=>c.Text=="Copy URL");
                 var link=controls.First(c=>c.AccessibleName=="Download URL");
-                var a=reveal.RectangleToScreen(reveal.ClientRectangle); var b=copy.RectangleToScreen(copy.ClientRectangle); var l=link.RectangleToScreen(link.ClientRectangle);
-                if(a.Top!=b.Top || a.Height!=b.Height || b.Left-a.Right<8 || l.Top-a.Bottom<8 || b.Right>l.Right+2) throw new Exception("Link action spacing failed at "+width);
+                var a=reveal.RectangleToScreen(reveal.ClientRectangle); var b=copy.RectangleToScreen(copy.ClientRectangle); var l=link.Parent.RectangleToScreen(link.Bounds);
+                if(a.Top!=b.Top || a.Height!=b.Height || b.Left-a.Right<8 || l.Top-a.Bottom<8 || b.Right>l.Right+2) throw new Exception("Link action spacing failed at "+width+" reveal="+a+" copy="+b+" link="+l);
                 if(!dialog.FooterActionsFit) throw new Exception("Footer clipping");
-                Console.WriteLine("PASS responsive link actions at "+width);
+                int collapsedHeight = link.Height;
+                dialog.ToggleUrl(); Application.DoEvents();
+                if(link.Height <= collapsedHeight || ((TextBox)link).ScrollBars != ScrollBars.Vertical || link.Text.Length < 600) throw new Exception("Expanded long URL must retain text and offer scrolling");
+                if(!dialog.FooterActionsFit) throw new Exception("Long URL displaced footer");
+                dialog.ToggleUrl(); Application.DoEvents();
+                Console.WriteLine("PASS responsive link actions and long URL at "+width);
             }
             dialog.Close();
         }

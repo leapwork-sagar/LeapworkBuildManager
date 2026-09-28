@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System;
 using System.Drawing;
 using System.Windows.Forms;
@@ -102,7 +102,7 @@ namespace LeapworkBuildManager
 
         void CreateBuildControls()
         {
-            Place(canvas, details, 24, 124, 572, 128);
+            Place(canvas, details, 24, 124, 572, 158);
             Place(details, Caption("Build number"), 16, 10, 280, 22);
             Place(details, build, 16, 38, 294, 27);
             build.Anchor = AnchorStyles.Top | AnchorStyles.Left;
@@ -114,10 +114,10 @@ namespace LeapworkBuildManager
             validation.AutoEllipsis = true;
             Place(details, validation, 16, 71, 540, 23);
             advanced.Text = "▸ Advanced: choose build type";
-            Place(details, advanced, 16, 96, 326, 28);
+            Place(details, advanced, 16, 110, 426, 32);
             advanced.Anchor = AnchorStyles.Top | AnchorStyles.Left;
             reset.Text = "Reset";
-            Place(details, reset, 454, 96, 102, 28);
+            Place(details, reset, 454, 110, 102, 32);
             reset.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             inferredRuntime = 0;
         }
@@ -125,7 +125,7 @@ namespace LeapworkBuildManager
         void CreateDownloadControls()
         {
             Place(canvas, resultsCard, 24, 264, 572, 154);
-            Place(resultsCard, resultSummary, 14, 10, 544, 22);
+            Place(resultsCard, resultSummary, 16, 12, 540, 24);
             resultSummary.Text = "Enter a build number to find available downloads.";
             matches.BackColor = Theme.Surface;
             matches.ForeColor = ForeColor;
@@ -134,7 +134,7 @@ namespace LeapworkBuildManager
             matches.ItemHeight = 36;
             matches.DrawMode = DrawMode.OwnerDrawFixed;
             matches.DrawItem += DrawBuildResult;
-            Place(resultsCard, matches, 14, 36, 544, 110);
+            Place(resultsCard, matches, 16, 40, 540, 110);
             download.Text = "Download selected build";
             download.BackColor = Theme.Accent;
             download.ForeColor = Theme.AccentText;
@@ -142,14 +142,14 @@ namespace LeapworkBuildManager
             Place(canvas, linkCard, 24, 484, 572, 112);
             url.ReadOnly = true;
             url.Multiline = true;
-            url.ScrollBars = ScrollBars.None;
+            url.ScrollBars = ScrollBars.Vertical;
             url.BorderStyle = BorderStyle.FixedSingle;
-            Place(linkCard, url, 14, 12, 544, 46);
+            Place(linkCard, url, 16, 16, 540, 46);
             copy.Text = "Copy link";
             open.Text = "Open link";
-            Place(linkCard, copy, 14, 70, 110, 30);
+            Place(linkCard, copy, 16, 74, 110, 32);
             copy.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-            Place(linkCard, open, 134, 70, 110, 30);
+            Place(linkCard, open, 138, 74, 110, 32);
             open.Anchor = AnchorStyles.Top | AnchorStyles.Left;
             idleStatus.AutoEllipsis = true;
             idleStatus.ForeColor = Theme.SecondaryText;
@@ -163,6 +163,8 @@ namespace LeapworkBuildManager
             Place(progressCard, status, 16, 60, 540, 25);
             status.AutoEllipsis = true;
             eta.ForeColor = Theme.SecondaryText;
+            eta.AutoEllipsis = true;
+            eta.TextChanged += delegate { detailsTip.SetToolTip(eta, eta.Text); };
             Place(progressCard, eta, 16, 88, 540, 24);
             cancel.Text = "Cancel";
             folder.Text = "Open folder";
@@ -319,6 +321,7 @@ namespace LeapworkBuildManager
             resultSummary.TextChanged += delegate
             {
                 detailsTip.SetToolTip(resultSummary, resultSummary.Text);
+                if (preferencesLoaded) ReflowDownloadPanel();
             };
             Shown += async delegate
             {

@@ -1,5 +1,20 @@
 # Changelog
 
+## v1.26
+
+- Render compact title-bar symbols centered without ellipses.
+- Recenter Reset on the current screen after the collapsed layout is complete.
+
+## v1.25
+
+- Align panel insets and secondary actions, and respect button text padding.
+- Wrap search summaries, scroll long links and installer paths, and expand diagnostic URLs.
+- Keep lengthy saved-installer error details separate from the recovery message.
+
+## v1.24
+
+- Balance Advanced and Reset button spacing with equal 32 px heights, a 12 px horizontal gap and 16 px panel padding, including narrow and expanded layouts.
+
 ## v1.23
 
 - Launch Open folder through the trusted Windows Explorer path.
