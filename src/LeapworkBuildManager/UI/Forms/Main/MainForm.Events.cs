@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Diagnostics;
 using System.Windows.Forms;
@@ -130,7 +130,7 @@ namespace LeapworkBuildManager
             {
                 if (!File.Exists(completedPath))
                     throw new IOException("The downloaded file has been moved or removed.");
-                Process.Start(new ProcessStartInfo("explorer.exe", "/select,\"" + completedPath + "\"") { UseShellExecute = true });
+                WindowsFileActions.OpenFolder(completedPath);
             }
             catch (Exception error)
             {

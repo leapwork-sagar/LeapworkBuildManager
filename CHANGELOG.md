@@ -1,17 +1,22 @@
 # Changelog
 
+## v1.23
+
+- Launch Open folder through the trusted Windows Explorer path.
+- Hide forward-slash network paths when exporting diagnostics with path hiding enabled.
+- Apply Windows Attachment Services before committing downloads, preserving existing installers if attachment processing fails.
+- Verify internet-origin metadata after replacement on NTFS and cover attachment rejection with regression tests.
+
 ## v1.22
 
 - Check saved installers on history selection, distinguish missing from inaccessible locations, and offer Open folder, Retry check or Download again.
 - Warn after 30 seconds waiting for download data, clear stale speed/ETA and recover when data resumes. Retain the 60-second inactivity timeout; retry restarts downloads.
-
 
 ## v1.21
 
 - Guard automatic keyboard focus changes against navigation and application switches.
 - Shorten destination paths, retain full-path hover text and add Copy folder path.
 - Add contextual action tooltips without duplicating existing path/status tooltips.
-
 
 ## v1.20
 

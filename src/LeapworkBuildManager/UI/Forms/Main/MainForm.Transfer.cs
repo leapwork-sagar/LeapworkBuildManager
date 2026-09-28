@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -89,7 +89,7 @@ namespace LeapworkBuildManager
                         switch (dialog.Choice)
                         {
                             case ExistingInstallerChoice.OpenFolder:
-                                System.Diagnostics.Process.Start("explorer.exe", "/select,\"" + destination + "\"");
+                                WindowsFileActions.OpenFolder(destination);
                                 return;
                             case ExistingInstallerChoice.SaveCopy:
                                 destination = await service.Preparation.CopyDestinationAsync(destination, source.Token);

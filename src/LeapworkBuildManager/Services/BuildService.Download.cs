@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Net.Http;
 using System.Threading;
@@ -87,6 +87,8 @@ namespace LeapworkBuildManager
                             await output.FlushAsync(timeout.Token).ConfigureAwait(false);
                         }
 
+                        token.ThrowIfCancellationRequested();
+                        await Task.Run(() => SaveAttachment(temp, destination, url), token).ConfigureAwait(false);
                         token.ThrowIfCancellationRequested();
                         // Keep the previous installer until transfer and length validation succeed.
                         if (replaceExisting && File.Exists(destination))

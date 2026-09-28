@@ -1,4 +1,4 @@
-# Leapwork Build Manager v1.22
+# Leapwork Build Manager v1.23
 
 [**Download latest portable EXE**](https://github.com/leapwork-sagar/LeapworkBuildManager/releases/latest/download/LeapworkBuildManager.exe) · [Release notes and checksums](https://github.com/leapwork-sagar/LeapworkBuildManager/releases/latest)
 

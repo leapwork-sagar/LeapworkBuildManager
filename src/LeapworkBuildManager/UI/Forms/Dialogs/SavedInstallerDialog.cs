@@ -64,7 +64,7 @@ namespace LeapworkBuildManager
                     result == SavedInstallerState.Missing ? "Installer not found at its saved location. It may have been moved or deleted." :
                     "Couldn’t check the saved location. Reconnect the drive or check permissions, then retry.";
                 if (openFolder && result == SavedInstallerState.Available)
-                    Process.Start(new ProcessStartInfo("explorer.exe", "/select,\"" + path + "\"") { UseShellExecute = true });
+                    WindowsFileActions.OpenFolder(path);
             }
             catch (OperationCanceledException) { }
             catch (Exception error)

@@ -61,7 +61,6 @@ PreparationTests uses deterministic probes and HTTP responses plus a pumped UI
 context to verify safety and incremental results. Existing regression suites stay
 part of the release gate. No additional packages or network dependencies are used.
 
-
 The src/LeapworkBuildManager project is the only working production source.
 Tests are outside production code, grouped by Application, Services and UI.
 Forms, Controls and Styling have distinct UI directories. ApplicationState is
@@ -87,7 +86,6 @@ The runtime ComboBox and unused availability Label were removed. Saved runtime
 integers are legacy serialization values; runtime inference depends on build data.
 The historical settings folder and activation key intentionally remain stable.
 
-
 ## Animation and persistence
 
 Panel animation reserves its maximum height once. Frames resize only the progress
@@ -104,7 +102,6 @@ Read-only settings stay protected, and migration/recovery forces one initial sav
 Prepared transfers reuse the initial destination check only for the same path.
 Changing to a numbered copy triggers another inspection. The download service always
 retains its final response-size disk check and atomic non-overwrite commit behavior.
-
 
 ## Cancellation and diagnostics
 
@@ -129,7 +126,6 @@ smoke-portable.ps1 hosts the production form from an isolated directory containi
 only the EXE, with temporary preferences, to check assets, startup and shutdown.
 It does not emulate a machine without the prerequisite framework or Windows SmartScreen.
 Release packaging produces a standalone EXE, full release ZIP and clean source ZIP.
-
 
 ## Network policy and resource ownership
 
@@ -176,3 +172,17 @@ and ETA. New data clears the warning and resets the speed baseline. The existing
 interrupt a pending read. Timeout/cancellation cleans the partial file and preserves
 an existing installer. Retry restarts rather than resuming. Tests use short injected
 intervals and simulated streams; physical network loss is not reproduced end to end.
+
+## Windows download security
+
+`WindowsFileActions` centralizes Explorer launches using the absolute Windows
+directory path. Download completion passes the temporary installer and its source
+URL to Windows Attachment Services on a dedicated STA thread before publishing
+the file. Attachment-policy failures fail the download and preserve an existing
+installer. Cancellation is checked again after attachment processing; Windows
+attachment processing itself cannot be interrupted by the cancellation token.
+
+Origin metadata follows Windows policy and filesystem capabilities. This is not
+publisher-signature verification and does not guarantee a particular Windows
+warning. The hardening tests exercise NTFS origin metadata after replacement,
+policy-failure cleanup, and diagnostic network-path redaction.
