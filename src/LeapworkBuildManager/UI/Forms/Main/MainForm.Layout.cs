@@ -231,6 +231,17 @@ namespace LeapworkBuildManager
             }
         }
 
+        protected override float LayoutScale { get { return layoutScale; } }
+
+        protected override void OnDisplayScaleChanged(float scale)
+        {
+            layoutScale = scale;
+            if (!layoutReady) return;
+            expandTimer.Stop();
+            panelHeight = expansionTarget;
+            ReflowDownloadPanel();
+        }
+
         int Px(int value)
         {
             return UiScale.Pixels(value, layoutScale);

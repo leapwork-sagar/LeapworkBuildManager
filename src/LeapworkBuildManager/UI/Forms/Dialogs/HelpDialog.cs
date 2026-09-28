@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace LeapworkBuildManager
 {
-    public sealed class HelpDialog : Form
+    public sealed class HelpDialog : DpiAwareForm
     {
         readonly SoftButton helpTab = new SoftButton
         {
@@ -361,6 +361,13 @@ namespace LeapworkBuildManager
                 tips.Dispose();
             };
             SelectHelp();
+        }
+
+        protected override float LayoutScale { get { return scale; } }
+        protected override void OnDisplayScaleChanged(float value)
+        {
+            scale = value;
+            FitToArea(Screen.FromRectangle(Bounds).WorkingArea);
         }
 
         public void FitToArea(Rectangle area)

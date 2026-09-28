@@ -6,7 +6,7 @@ using System.Windows.Forms;
 
 namespace LeapworkBuildManager
 {
-    public sealed class ExistingInstallerDialog : Form
+    public sealed class ExistingInstallerDialog : DpiAwareForm
     {
         public ExistingInstallerChoice Choice { get; private set; }
         public string Destination { get; private set; }
@@ -41,7 +41,7 @@ namespace LeapworkBuildManager
             MaximizeBox = MinimizeBox = false;
             ShowInTaskbar = false;
             StartPosition = FormStartPosition.CenterParent;
-            AutoScaleMode = AutoScaleMode.Dpi;
+            AutoScaleMode = AutoScaleMode.None;
             AutoScaleDimensions = new SizeF(96, 96);
             ClientSize = new Size(620, 450);
             var title = new Panel

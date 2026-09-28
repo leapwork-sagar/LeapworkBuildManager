@@ -69,6 +69,14 @@ jobs:
             releases/${{ steps.version.outputs.release_tag }}/release-notes.md
           if-no-files-found: error
           retention-days: 7
+      - name: Retain release test diagnostics
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: release-tests-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/test-results/
+          if-no-files-found: warn
+          retention-days: 14
   publish:
     needs: build
     if: github.ref == 'refs/heads/main'
@@ -76,6 +84,9 @@ jobs:
     timeout-minutes: 10
     permissions:
       contents: write
+      id-token: write
+      attestations: write
+      artifact-metadata: write
     steps:
       # Do not check out or execute repository code in this privileged job.
       - name: Retrieve this run's validated artifact
@@ -95,6 +106,21 @@ jobs:
           test "$(wc -l < SHA256SUMS.txt)" -eq 1
           grep -Eq '^[0-9A-Fa-f]{64}  LeapworkBuildManager[.]exe$' SHA256SUMS.txt
           sha256sum --check --strict SHA256SUMS.txt
+      - name: Attest the verified executable
+        id: provenance
+        uses: actions/attest@v4
+        with:
+          subject-path: release/LeapworkBuildManager.exe
+      - name: Verify and retain provenance
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          BUNDLE_PATH: ${{ steps.provenance.outputs.bundle-path }}
+        run: |
+          set -euo pipefail
+          cp "$BUNDLE_PATH" release/LeapworkBuildManager.exe.sigstore.json
+          gh attestation verify release/LeapworkBuildManager.exe --repo "$GH_REPO" --bundle release/LeapworkBuildManager.exe.sigstore.json
       - name: Create draft release
         shell: bash
         env:
@@ -104,6 +130,6 @@ jobs:
         run: |
           set -euo pipefail
           [[ "$RELEASE_TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]
-          gh release create "$RELEASE_TAG" release/LeapworkBuildManager.exe release/SHA256SUMS.txt \
+          gh release create "$RELEASE_TAG" release/LeapworkBuildManager.exe release/SHA256SUMS.txt release/LeapworkBuildManager.exe.sigstore.json \
             --draft --target "$GITHUB_SHA" --title "Leapwork Build Manager $RELEASE_TAG" \
             --generate-notes --notes-file release/release-notes.md

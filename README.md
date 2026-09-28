@@ -28,7 +28,7 @@ are required; the runtime is not bundled. No adjacent configuration or SDK is ne
 The executable is unsigned. Downloads restart when retried; resume is not supported.
 Settings/history and logs are stored under `%LOCALAPPDATA%/LeapworkBuildUrlGenerator`.
 Close an older running release first, otherwise its existing window is activated.
-Reopen the app after changing Windows display scaling.
+The window adapts to display-scaling changes when moved between monitors.
 
 ## Development
 
