@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text.RegularExpressions;
 
 namespace LeapworkBuildManager
@@ -25,7 +25,7 @@ namespace LeapworkBuildManager
                 throw new ArgumentException(error);
             if (kind == BuildKind.PreRelease && !core)
                 throw new ArgumentException("Pre-release is available only for .net8 or higher.");
-            return new Uri("https://sawindowreleasedata.blob.core.windows.net/" + (kind == BuildKind.Release ? "leaptest-release-builds/" : "leaptest-unstable-builds/") + "Leapwork_" + (core && kind != BuildKind.Release ? "NETCore_" : "") + type + "_x64_" + input.Trim() + ".msi");
+            return new Uri("https://sawindowreleasedata.blob.core.windows.net/" + (kind == BuildKind.Release ? "leaptest-release-builds/" : "leaptest-unstable-builds/") + "Leapwork_" + (core ? "NETCore_" : "") + type + "_x64_" + input.Trim() + ".msi");
         }
 
         public static bool IsModern(string build)

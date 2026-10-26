@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Net;
 using System.Net.Http;
@@ -32,6 +32,43 @@ class BuildServiceTests
         Console.WriteLine(count + " checks passed.");
     }
 
+    static async Task CheckReleaseNaming()
+    {
+        foreach (var status in new[] { HttpStatusCode.OK, HttpStatusCode.NotFound, HttpStatusCode.Gone, HttpStatusCode.Forbidden, HttpStatusCode.InternalServerError })
+        {
+            var calls = new System.Collections.Generic.List<string>();
+            var fake = new Fake { Reply = (r, t) =>
+            {
+                calls.Add(r.RequestUri.AbsoluteUri);
+                return new HttpResponseMessage(calls.Count == 1 ? status : HttpStatusCode.OK) { Content = new ByteArrayContent(new byte[321]) };
+            }};
+            using (var service = new BuildService(fake))
+            {
+                var controller = new BuildController(service);
+                controller.Transition(ApplicationState.Idle);
+                var result = await controller.CheckAsync("2026.3.0", BuildKind.Release, CancellationToken.None);
+                bool fallback = status == HttpStatusCode.NotFound || status == HttpStatusCode.Gone;
+                Assert(calls.Count == (fallback ? 2 : 1), "Release fallback only for missing: " + status);
+                Assert(controller.CurrentUrl.AbsoluteUri == calls[calls.Count - 1], "manual check retains verified URL: " + status);
+                if (result.IsAvailable) Assert(controller.Selected.SizeBytes == 321, "verified Release size retained");
+            }
+        }
+        var history = new System.Collections.Generic.List<string>();
+        using (var service = new BuildService(new Fake { Reply = (r, t) =>
+        {
+            lock (history) history.Add(r.RequestUri.AbsoluteUri);
+            return new HttpResponseMessage(r.RequestUri.AbsolutePath.Contains("NETCore") ? HttpStatusCode.NotFound : HttpStatusCode.OK);
+        }}))
+        {
+            var matches = await service.FindAsync("2026.3.0", null, CancellationToken.None);
+            var release = Array.Find(matches, m => m.BuildType == BuildKind.Release);
+            Assert(release.Available && !release.Url.AbsoluteUri.Contains("NETCore"), "automatic search preserves legacy Release fallback URL");
+            history.Clear();
+            await service.CheckBuildAsync("2025.2.990", BuildKind.Release, CancellationToken.None);
+            Assert(history.Count == 1 && !history[0].Contains("NETCore"), "older Release uses original naming only");
+        }
+    }
+
     static async Task Run()
     {
         string error;
@@ -63,7 +100,8 @@ class BuildServiceTests
             Assert(!BuildService.Validate(value, out error), "invalid " + value);
         var url = BuildService.BuildUrl("2025.3.990", "Experimental", true);
         Assert(url.AbsoluteUri.EndsWith("leaptest-unstable-builds/Leapwork_NETCore_Experimental_x64_2025.3.990.msi"), "Core mapping");
-        Assert(BuildService.BuildUrl("2025.2.990", "Release", true) == BuildService.BuildUrl("2025.2.990", "Release", false), "Release mapping preserved");
+        Assert(BuildService.BuildUrl("2026.3.0", "Release", true).AbsoluteUri == "https://sawindowreleasedata.blob.core.windows.net/leaptest-release-builds/Leapwork_NETCore_Release_x64_2026.3.0.msi", "modern Release mapping");
+        await CheckReleaseNaming();
         Assert(BuildService.BuildUrl("2026.1.329", "PreRelease", true).AbsoluteUri == "https://sawindowreleasedata.blob.core.windows.net/leaptest-unstable-builds/Leapwork_NETCore_PreRelease_x64_2026.1.329.msi", "exact PreRelease URL");
         try
         {

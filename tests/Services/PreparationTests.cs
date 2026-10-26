@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Net;
@@ -255,7 +255,7 @@ static class PreparationTests
         {
             Reply = async (q, t) =>
             {
-                if (!q.RequestUri.AbsoluteUri.Contains("Leapwork_Release_"))
+                if (!q.RequestUri.AbsoluteUri.Contains("_Release_"))
                     await gate.Task;
                 return Reply();
             }
