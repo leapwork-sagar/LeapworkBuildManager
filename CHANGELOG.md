@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.27
+
+- Detect modern Release installers using NETCore_Release names in automatic and manual checks.
+- Fall back to original Release filenames only when the modern filename is missing.
+- Include live display-scaling support and the previously merged UI diagnostics improvements.
+
 ## v1.26
 
 - Render compact title-bar symbols centered without ellipses.

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -185,13 +185,13 @@ namespace LeapworkBuildManager
             InterruptedBySleep = false;
             try
             {
-                bool modern = BuildService.IsModern(build);
-                var url = BuildService.BuildUrl(build, kind, modern);
-                PreparedUrl = url;
-                var result = await service.CheckAsync(url, token);
+                PreparedUrl = BuildService.BuildUrl(build, kind, BuildService.IsModern(build));
+                var match = await service.CheckBuildAsync(build, kind, token);
                 token.ThrowIfCancellationRequested();
+                PreparedUrl = match.Url;
+                var result = new AvailabilityResult(match.Status, match.SizeBytes, match.Detail);
                 if (result.IsAvailable)
-                    Selected = new VerifiedBuild(new BuildMatch { BuildNumber = build, BuildType = kind, Modern = modern, Url = url, Available = true, Status = result.Status, SizeBytes = result.SizeBytes });
+                    Selected = new VerifiedBuild(match);
                 Transition(result.IsAvailable ? ApplicationState.Ready : ApplicationState.Failed);
                 return result;
             }

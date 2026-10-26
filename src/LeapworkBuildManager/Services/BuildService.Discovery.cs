@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
@@ -20,7 +20,7 @@ namespace LeapworkBuildManager
                 foreach (BuildKind kind in kinds)
                 {
                     BuildKind selected = kind;
-                    tasks.Add(FindOneAsync(build, selected, modern, limit, token, result =>
+                    tasks.Add(FindOneAsync(build, selected, limit, token, result =>
                     {
                         int count = Interlocked.Increment(ref completed);
                         if (progress != null)
@@ -32,24 +32,12 @@ namespace LeapworkBuildManager
             }
         }
 
-        async Task<BuildMatch> FindOneAsync(string build, BuildKind kind, bool modern, SemaphoreSlim limit, CancellationToken token, Action<BuildMatch> finished)
+        async Task<BuildMatch> FindOneAsync(string build, BuildKind kind, SemaphoreSlim limit, CancellationToken token, Action<BuildMatch> finished)
         {
             await limit.WaitAsync(token).ConfigureAwait(false);
             try
             {
-                var result = new BuildMatch
-                {
-                    BuildNumber = build,
-                    BuildType = kind,
-                    Modern = modern,
-                    Url = BuildUrl(build, kind, modern)
-                };
-                var availability = await CheckAsync(result.Url, token).ConfigureAwait(false);
-                result.Status = availability.Status;
-                result.Available = availability.IsAvailable;
-                result.Missing = availability.Status == AvailabilityStatus.NotFound;
-                result.SizeBytes = availability.SizeBytes;
-                result.Detail = availability.Detail;
+                var result = await CheckBuildAsync(build, kind, token).ConfigureAwait(false);
                 finished(result);
                 return result;
             }
@@ -57,6 +45,29 @@ namespace LeapworkBuildManager
             {
                 limit.Release();
             }
+        }
+
+        public async Task<BuildMatch> CheckBuildAsync(string build, BuildKind kind, CancellationToken token)
+        {
+            bool modern = IsModern(build);
+            var url = BuildUrl(build, kind, modern);
+            var availability = await CheckAsync(url, token).ConfigureAwait(false);
+            // Some modern Release installers retain the original filename. Only a confirmed
+            // missing file warrants fallback; connection/access errors must stay visible.
+            if (modern && kind == BuildKind.Release && availability.Status == AvailabilityStatus.NotFound)
+            {
+                token.ThrowIfCancellationRequested();
+                url = BuildUrl(build, kind, false);
+                availability = await CheckAsync(url, token).ConfigureAwait(false);
+            }
+            token.ThrowIfCancellationRequested();
+            return new BuildMatch
+            {
+                BuildNumber = build, BuildType = kind, Modern = modern, Url = url,
+                Status = availability.Status, Available = availability.IsAvailable,
+                Missing = availability.Status == AvailabilityStatus.NotFound,
+                SizeBytes = availability.SizeBytes, Detail = availability.Detail
+            };
         }
 
         public async Task<AvailabilityResult> CheckAsync(Uri url, CancellationToken token)
