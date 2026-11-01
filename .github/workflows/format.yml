@@ -53,6 +53,6 @@ jobs:
           if ((${#files[@]})); then "$(go env GOPATH)/bin/editorconfig-checker" "${files[@]}"; fi
       - name: Check Markdown formatting
         if: steps.files.outputs.markdown != ''
-        uses: DavidAnson/markdownlint-cli2-action@v24
+        uses: DavidAnson/markdownlint-cli2-action@v25
         with:
           globs: ${{ steps.files.outputs.markdown }}
